@@ -19,6 +19,8 @@ class _HomeState extends State<Home> {
   TextEditingController num1Controller = TextEditingController();
   TextEditingController num2Controller = TextEditingController();
 
+  bool condition = false;
+
   void calcular(String operacao) {
     if (isNumeric(num1Controller.text) && isNumeric(num2Controller.text)) {
       setState(() {
@@ -45,7 +47,30 @@ class _HomeState extends State<Home> {
     num1Controller.text = "";
     num2Controller.text = "";
     setState(() {
-      _infoText = "";
+      _infoText = 'Resultado: 0';
+      FocusScope.of(context).requestFocus(new FocusNode());
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    num1Controller.addListener(() {
+      btnReset();
+    });
+    num2Controller.addListener(() {
+      btnReset();
+    });
+  }
+
+  void btnReset() {
+    setState(() {
+      if (num1Controller.text.isNotEmpty || num2Controller.text.isNotEmpty) {
+        condition = true;
+      } else {
+        condition = false;
+      }
     });
   }
 
@@ -53,18 +78,26 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Calculadora"),
-        centerTitle: true,
-        backgroundColor: Colors.cyan,
+        title: Text('Calculadora'),
+        backgroundColor: Colors.blueAccent,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              _resetFields();
-            },
-          )
+          Opacity(
+              //define a opacidade conforme o preenchimento dos campos.
+              opacity: this.condition ? 1.0 : 0.0,
+              child: ButtonTheme(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: RaisedButton(
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      //desativa o clique do botão.
+                      condition ? _resetFields() : null;
+                    },
+                    child:
+                    Icon(Icons.refresh),
+                  )))
         ],
-      ),
+      ), //appbar
       body: SingleChildScrollView(
         padding: EdgeInsets.all(10.0),
         child: Form(
